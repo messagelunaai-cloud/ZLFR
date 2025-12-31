@@ -13,14 +13,22 @@ export default async function handler(req, res) {
 
   try {
     // Submit to Stamped.io API
-    const response = await fetch('https://api.stamped.io/v2/reviews', {
+    const storeHash = process.env.VITE_STAMPED_STORE_HASH;
+    const publicKey = process.env.VITE_STAMPED_PUBLIC_KEY;
+
+    console.log('Submitting review to Stamped.io:', {
+      storeHash,
+      productId: product_external_id,
+      rating
+    });
+
+    const response = await fetch(`https://api.stamped.io/v2/${storeHash}/reviews`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'X-Stamped-Auth': process.env.VITE_STAMPED_PUBLIC_KEY,
+        'Authorization': `Bearer ${publicKey}`,
       },
       body: JSON.stringify({
-        storeHash: process.env.VITE_STAMPED_STORE_HASH,
         productId: product_external_id,
         rating: parseInt(rating),
         reviewerName: reviewer_name || 'Anonymous',
@@ -29,15 +37,18 @@ export default async function handler(req, res) {
       })
     });
 
+    const responseText = await response.text();
+    console.log('Stamped.io response status:', response.status);
+    console.log('Stamped.io response:', responseText);
+
     if (!response.ok) {
-      const error = await response.json();
-      return res.status(response.status).json({ error: error.message || 'Failed to submit review' });
+      return res.status(response.status).json({ error: `Stamped.io API error: ${response.status}` });
     }
 
-    const data = await response.json();
+    const data = JSON.parse(responseText);
     return res.status(200).json({ success: true, review: data });
   } catch (error) {
-    console.error('Stamped.io review submission error:', error);
-    return res.status(500).json({ error: 'Failed to submit review' });
+    console.error('Stamped.io review submission error:', error.message);
+    return res.status(500).json({ error: error.message || 'Failed to submit review' });
   }
 }
