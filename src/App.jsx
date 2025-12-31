@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react'
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { Analytics } from '@vercel/analytics/react'
+import { SpeedInsights } from '@vercel/speed-insights/react'
 import { StoreProvider } from './store'
 import Layout from './Layout'
 
@@ -30,6 +31,7 @@ export default function App() {
     <StoreProvider>
       <ScrollToTop />
       <Analytics />
+      <SpeedInsights />
       <Routes>
         <Route element={<Layout />}>
           <Route path="/" element={<Home />} />
