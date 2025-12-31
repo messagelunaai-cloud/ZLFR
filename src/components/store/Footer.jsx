@@ -1,10 +1,13 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { Instagram } from 'lucide-react'
+import { Instagram, X } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
 import TrustBadges from './TrustBadges'
+import NotFound from '@/pages/NotFound'
 
 export default function Footer() {
   const [policiesOpen, setPoliciesOpen] = useState(false)
+  const [show404, setShow404] = useState(false)
   const dropdownRef = useRef(null)
 
   useEffect(() => {
@@ -35,6 +38,37 @@ export default function Footer() {
 
   return (
     <footer className="border-t border-white/10 mt-14 relative">
+      {/* 404 Preview Modal */}
+      <AnimatePresence>
+        {show404 && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.4 }}
+            className="fixed inset-0 z-50 bg-black/80 overflow-y-auto"
+            onClick={() => setShow404(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              transition={{ duration: 0.4 }}
+              className="relative"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button
+                onClick={() => setShow404(false)}
+                className="fixed top-6 right-6 z-51 p-2 bg-zlfr-gold text-zlfr-ink rounded-full hover:bg-zlfr-gold/90 transition-colors"
+              >
+                <X className="w-6 h-6" />
+              </button>
+              <NotFound onClose={() => setShow404(false)} />
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Trust Badges */}
       <div className="max-w-6xl mx-auto px-6 py-8 border-b border-white/10">
         <TrustBadges variant="grid" />
@@ -85,6 +119,15 @@ export default function Footer() {
                 <Link to="/shipping" className="block text-xs text-white/80 hover:text-white mb-2">Shipping Policy</Link>
                 <Link to="/returns" className="block text-xs text-white/80 hover:text-white mb-2">Refund Policy</Link>
                 <Link to="/contact" className="block text-xs text-white/80 hover:text-white">Contact Information</Link>
+                <button 
+                  onClick={() => {
+                    setShow404(true)
+                    setPoliciesOpen(false)
+                  }}
+                  className="block w-full text-left text-xs text-zlfr-gold hover:text-zlfr-gold/80 mt-3 pt-3 border-t border-white/10"
+                >
+                  🎉 View 404 Page
+                </button>
               </div>
             )}
           </div>

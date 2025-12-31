@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { getProduct, getProducts } from '@/lib/shopify'
 import { useStore } from '@/store'
-import { motion } from 'framer-motion'
-import { Ruler } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { Ruler, ShoppingCart, Check } from 'lucide-react'
 import ImageGallery from '@/components/store/ImageGallery'
 import TrustBadges from '@/components/store/TrustBadges'
 import SizeGuide from '@/components/store/SizeGuide'
@@ -19,6 +19,7 @@ export default function ProductDetail() {
   const [qty, setQty] = React.useState(1)
   const [showSizeGuide, setShowSizeGuide] = useState(false)
   const [addedToCart, setAddedToCart] = useState(false)
+  const [showCartAnimation, setShowCartAnimation] = useState(false)
 
   useEffect(() => {
     async function loadProduct() {
@@ -64,7 +65,11 @@ export default function ProductDetail() {
     console.log('Adding to cart - variantId:', product.variantId)
     addToCart({ ...product, variantId: product.variantId }, qty)
     setAddedToCart(true)
-    setTimeout(() => setAddedToCart(false), 2000)
+    setShowCartAnimation(true)
+    setTimeout(() => {
+      setAddedToCart(false)
+      setShowCartAnimation(false)
+    }, 3000)
   };
 
   return (
@@ -112,32 +117,104 @@ export default function ProductDetail() {
               {/* Quantity Selector */}
               <div className="flex items-center gap-4">
                 <label className="text-sm text-white/60">Quantity</label>
-                <div className="flex items-center border border-white/10 rounded-lg">
-                  <button
+                <div className="flex items-center border border-white/10 rounded-lg overflow-hidden">
+                  <motion.button
                     onClick={() => setQty(Math.max(1, qty - 1))}
                     className="px-4 py-2 hover:bg-white/5 transition-colors"
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9, backgroundColor: "rgba(200, 160, 74, 0.2)" }}
+                    transition={{ duration: 0.15 }}
                   >
                     −
-                  </button>
-                  <span className="px-6 py-2 border-x border-white/10">{qty}</span>
-                  <button
+                  </motion.button>
+                  <motion.span 
+                    key={qty}
+                    initial={{ scale: 1.3, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ duration: 0.2, type: "spring", stiffness: 300 }}
+                    className="px-6 py-2 border-x border-white/10"
+                  >
+                    {qty}
+                  </motion.span>
+                  <motion.button
                     onClick={() => setQty(qty + 1)}
                     className="px-4 py-2 hover:bg-white/5 transition-colors"
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9, backgroundColor: "rgba(200, 160, 74, 0.2)" }}
+                    transition={{ duration: 0.15 }}
                   >
                     +
-                  </button>
+                  </motion.button>
                 </div>
               </div>
 
               {/* Add to Cart Button */}
-              <motion.button
-                onClick={handleAddToCart}
-                className="w-full bg-zlfr-gold text-zlfr-ink py-4 rounded-lg font-medium hover:bg-zlfr-gold/90 transition-colors"
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                {addedToCart ? '✓ Added to Cart!' : 'Add to Cart'}
-              </motion.button>
+              <div className="relative">
+                <motion.button
+                  onClick={handleAddToCart}
+                  className={`w-full py-4 rounded-lg font-medium transition-all duration-500 ${
+                    addedToCart 
+                      ? 'bg-green-500 text-white' 
+                      : 'bg-zlfr-gold text-zlfr-ink hover:bg-zlfr-gold/90'
+                  }`}
+                  whileHover={{ scale: addedToCart ? 1 : 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  animate={addedToCart ? {
+                    scale: [1, 1.05, 1],
+                    transition: { duration: 0.3 }
+                  } : {}}
+                >
+                  <AnimatePresence mode="wait">
+                    {addedToCart ? (
+                      <motion.span
+                        key="added"
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        transition={{ duration: 0.3 }}
+                        className="flex items-center justify-center gap-2"
+                      >
+                        <Check className="w-5 h-5" />
+                        Added to Cart!
+                      </motion.span>
+                    ) : (
+                      <motion.span
+                        key="add"
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        transition={{ duration: 0.3 }}
+                        className="flex items-center justify-center gap-2"
+                      >
+                        <ShoppingCart className="w-5 h-5" />
+                        Add to Cart
+                      </motion.span>
+                    )}
+                  </AnimatePresence>
+                </motion.button>
+
+                {/* Floating Success Animation */}
+                <AnimatePresence>
+                  {showCartAnimation && (
+                    <motion.div
+                      initial={{ opacity: 1, y: 0, scale: 1 }}
+                      animate={{ 
+                        opacity: 0, 
+                        y: -100, 
+                        scale: 0.5,
+                        transition: { duration: 1, ease: "easeOut" }
+                      }}
+                      exit={{ opacity: 0 }}
+                      className="absolute top-0 left-1/2 -translate-x-1/2 pointer-events-none"
+                    >
+                      <div className="bg-zlfr-gold text-zlfr-ink px-6 py-3 rounded-full font-medium shadow-lg flex items-center gap-2">
+                        <ShoppingCart className="w-5 h-5" />
+                        +{qty}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
 
               {/* Trust Badges */}
               <div className="pt-6">

@@ -12,6 +12,7 @@ import Terms from './pages/Terms'
 import Shipping from './pages/Shipping'
 import Returns from './pages/Returns'
 import Contact from './pages/Contact'
+import NotFound from './pages/NotFound'
 
 function ScrollToTop() {
   const location = useLocation()
@@ -38,7 +39,7 @@ export default function App() {
           <Route path="/shipping" element={<Shipping />} />
           <Route path="/returns" element={<Returns />} />
           <Route path="/contact" element={<Contact />} />
-          <Route path="*" element={<Navigate to="/" replace />} />
+          <Route path="*" element={<NotFound />} />
         </Route>
       </Routes>
     </StoreProvider>

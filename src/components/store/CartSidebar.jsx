@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { X, Minus, Plus, Trash2 } from 'lucide-react'
 import { useStore } from '@/store'
 import { createCheckout } from '@/lib/shopify'
+import { motion, AnimatePresence } from 'framer-motion'
 
 export default function CartSidebar({ open, onClose }) {
   const { cartItems, updateQty, removeItem, subtotal } = useStore()
@@ -22,14 +23,18 @@ export default function CartSidebar({ open, onClose }) {
 
   return (
     <>
-      <div
-        className={`fixed inset-0 z-40 bg-black/60 transition ${open ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: open ? 1 : 0 }}
+        transition={{ duration: 0.3 }}
+        className={`fixed inset-0 z-40 bg-black/60 ${open ? 'pointer-events-auto' : 'pointer-events-none'}`}
         onClick={onClose}
       />
-      <aside
-        className={`fixed right-0 top-0 z-50 h-full w-[360px] max-w-[92vw] bg-zlfr-smoke border-l border-white/10 transition-transform ${
-          open ? 'translate-x-0' : 'translate-x-full'
-        }`}
+      <motion.aside
+        initial={{ x: '100%' }}
+        animate={{ x: open ? 0 : '100%' }}
+        transition={{ type: "spring", damping: 30, stiffness: 300 }}
+        className="fixed right-0 top-0 z-50 h-full w-[360px] max-w-[92vw] bg-zlfr-smoke border-l border-white/10"
       >
         <div className="h-16 px-5 flex items-center justify-between border-b border-white/10">
           <div className="text-[11px] tracking-[0.35em] uppercase">Cart</div>
@@ -40,33 +45,88 @@ export default function CartSidebar({ open, onClose }) {
 
         <div className="p-5 space-y-5 overflow-auto h-[calc(100%-180px)]">
           {cartItems.length === 0 ? (
-            <div className="text-sm text-white/60">Your cart is empty.</div>
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="text-sm text-white/60"
+            >
+              Your cart is empty.
+            </motion.div>
           ) : (
-            cartItems.map(item => (
-              <div key={item.id} className="flex gap-3">
-                <img src={item.image} alt={item.name} className="h-16 w-16 object-cover bg-white/5" />
+            <AnimatePresence mode="popLayout">
+              {cartItems.map(item => (
+                <motion.div 
+                  key={item.id} 
+                  className="flex gap-3"
+                  initial={{ opacity: 0, x: -20, height: 0 }}
+                  animate={{ 
+                    opacity: 1, 
+                    x: 0, 
+                    height: "auto",
+                    transition: { duration: 0.3, ease: "easeOut" }
+                  }}
+                  exit={{ 
+                    opacity: 0,
+                    x: 100,
+                    height: 0,
+                    marginBottom: 0,
+                    transition: { duration: 0.4, ease: "easeIn" }
+                  }}
+                  layout
+                >
+                  <img src={item.image} alt={item.name} className="h-16 w-16 object-cover bg-white/5" />
                 <div className="flex-1">
                   <div className="text-[11px] tracking-[0.22em] uppercase">{item.name}</div>
                   <div className="mt-1 text-xs text-white/60">${item.price}</div>
 
                   <div className="mt-3 flex items-center justify-between">
-                    <div className="flex items-center gap-2 border border-white/10 px-2 py-1">
-                      <button onClick={() => updateQty(item.id, item.qty - 1)} aria-label="Decrease">
+                    <div className="flex items-center gap-2 border border-white/10 px-2 py-1 rounded">
+                      <motion.button 
+                        onClick={() => updateQty(item.id, item.qty - 1)} 
+                        aria-label="Decrease"
+                        whileHover={{ scale: 1.2 }}
+                        whileTap={{ scale: 0.8, backgroundColor: "rgba(200, 160, 74, 0.2)" }}
+                        transition={{ duration: 0.15 }}
+                        className="rounded"
+                      >
                         <Minus size={14} />
-                      </button>
-                      <div className="text-xs w-6 text-center">{item.qty}</div>
-                      <button onClick={() => updateQty(item.id, item.qty + 1)} aria-label="Increase">
+                      </motion.button>
+                      <motion.div 
+                        key={`${item.id}-${item.qty}`}
+                        initial={{ scale: 1.3, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        transition={{ duration: 0.2, type: "spring", stiffness: 300 }}
+                        className="text-xs w-6 text-center"
+                      >
+                        {item.qty}
+                      </motion.div>
+                      <motion.button 
+                        onClick={() => updateQty(item.id, item.qty + 1)} 
+                        aria-label="Increase"
+                        whileHover={{ scale: 1.2 }}
+                        whileTap={{ scale: 0.8, backgroundColor: "rgba(200, 160, 74, 0.2)" }}
+                        transition={{ duration: 0.15 }}
+                        className="rounded"
+                      >
                         <Plus size={14} />
-                      </button>
+                      </motion.button>
                     </div>
 
-                    <button onClick={() => removeItem(item.id)} className="opacity-70 hover:opacity-100" aria-label="Remove">
+                    <motion.button 
+                      onClick={() => removeItem(item.id)} 
+                      className="opacity-70 hover:opacity-100" 
+                      aria-label="Remove"
+                      whileHover={{ scale: 1.1, color: "#ef4444" }}
+                      whileTap={{ scale: 0.9 }}
+                      transition={{ duration: 0.15 }}
+                    >
                       <Trash2 size={16} />
-                    </button>
+                    </motion.button>
                   </div>
                 </div>
-              </div>
-            ))
+              </motion.div>
+            ))}
+            </AnimatePresence>
           )}
         </div>
 
@@ -91,7 +151,7 @@ export default function CartSidebar({ open, onClose }) {
             </button>
           </div>
         </div>
-      </aside>
+      </motion.aside>
     </>
   )
 }

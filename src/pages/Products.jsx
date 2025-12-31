@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom'
 import { getProducts } from '@/lib/shopify'
 import ProductCard from '@/components/store/ProductCard'
 import FilterBar from '@/components/store/FilterBar'
+import { motion } from 'framer-motion'
 
 export default function Products() {
   const [params, setParams] = useSearchParams()
@@ -71,7 +72,30 @@ export default function Products() {
     return (
       <section className="py-14">
         <div className="container-page">
-          <div className="text-center py-20 text-white/60">Loading products...</div>
+          <motion.div 
+            className="text-center py-20 text-white/60"
+            animate={{ opacity: [0.5, 1, 0.5] }}
+            transition={{ duration: 1.5, repeat: Infinity }}
+          >
+            <div className="text-lg">Loading products...</div>
+            <div className="mt-4 flex justify-center gap-2">
+              <motion.div 
+                className="w-2 h-2 rounded-full bg-zlfr-gold"
+                animate={{ scale: [1, 1.2, 1] }}
+                transition={{ duration: 0.8, delay: 0 }}
+              />
+              <motion.div 
+                className="w-2 h-2 rounded-full bg-zlfr-gold"
+                animate={{ scale: [1, 1.2, 1] }}
+                transition={{ duration: 0.8, delay: 0.2 }}
+              />
+              <motion.div 
+                className="w-2 h-2 rounded-full bg-zlfr-gold"
+                animate={{ scale: [1, 1.2, 1] }}
+                transition={{ duration: 0.8, delay: 0.4 }}
+              />
+            </div>
+          </motion.div>
         </div>
       </section>
     )
@@ -79,8 +103,18 @@ export default function Products() {
 
   return (
     <section className="py-14">
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
+      <motion.div 
+        className="max-w-7xl mx-auto px-6"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, ease: "easeOut" }}
+      >
+        <motion.div 
+          className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.1 }}
+        >
           <div>
             <h2 className="text-4xl font-light">Products</h2>
             <div className="mt-2 text-sm text-white/60">{sorted.length} items</div>
@@ -96,12 +130,26 @@ export default function Products() {
             />
             <FilterBar onFilterChange={handleFilterChange} products={products} />
           </div>
-        </div>
+        </motion.div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {sorted.map(p => <ProductCard key={p.id} product={p} />)}
-        </div>
-      </div>
+        <motion.div 
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+        >
+          {sorted.map((p, index) => (
+            <motion.div
+              key={p.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: index * 0.05 }}
+            >
+              <ProductCard product={p} />
+            </motion.div>
+          ))}
+        </motion.div>
+      </motion.div>
     </section>
   )
 }
