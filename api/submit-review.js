@@ -4,10 +4,10 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { rating, body, reviewer_name, product_external_id } = req.body;
+  const { productId, rating, reviewText, reviewerName } = req.body;
 
   // Validate required fields
-  if (!rating || !body || !product_external_id) {
+  if (!rating || !reviewText || !productId) {
     return res.status(400).json({ error: 'Missing required fields' });
   }
 
@@ -18,21 +18,21 @@ export default async function handler(req, res) {
 
     console.log('Submitting review to Stamped.io:', {
       storeHash,
-      productId: product_external_id,
+      productId,
       rating
     });
 
-    const response = await fetch(`https://api.stamped.io/v2/${storeHash}/reviews`, {
+    const response = await fetch(`https://stamped.io/api/reviews`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${publicKey}`,
       },
       body: JSON.stringify({
-        productId: product_external_id,
+        storeHash: storeHash,
+        productId: productId,
         rating: parseInt(rating),
-        reviewerName: reviewer_name || 'Anonymous',
-        reviewText: body,
+        reviewerName: reviewerName || 'Anonymous',
+        reviewText: reviewText,
         source: 'webform',
       })
     });
