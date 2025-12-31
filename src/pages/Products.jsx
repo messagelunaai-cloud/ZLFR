@@ -3,7 +3,6 @@ import { useSearchParams } from 'react-router-dom'
 import { getProducts } from '@/lib/shopify'
 import ProductCard from '@/components/store/ProductCard'
 import FilterBar from '@/components/store/FilterBar'
-import QuickViewModal from '@/components/store/QuickViewModal'
 
 export default function Products() {
   const [params, setParams] = useSearchParams()
@@ -12,7 +11,6 @@ export default function Products() {
   const search = params.get('search') || ''
   const [products, setProducts] = useState([])
   const [loading, setLoading] = useState(true)
-  const [quickViewProduct, setQuickViewProduct] = useState(null)
   const [priceRange, setPriceRange] = useState([0, 1000])
 
   useEffect(() => {
@@ -101,15 +99,9 @@ export default function Products() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {sorted.map(p => <ProductCard key={p.id} product={p} onQuickView={() => setQuickViewProduct(p)} />)}
+          {sorted.map(p => <ProductCard key={p.id} product={p} />)}
         </div>
       </div>
-      
-      <QuickViewModal 
-        product={quickViewProduct} 
-        isOpen={!!quickViewProduct} 
-        onClose={() => setQuickViewProduct(null)} 
-      />
     </section>
   )
 }
