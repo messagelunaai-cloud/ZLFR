@@ -4,13 +4,20 @@ export const StoreContext = React.createContext(null)
 
 export function StoreProvider({ children }) {
   const [cartOpen, setCartOpen] = React.useState(false)
-  const [cartItems, setCartItems] = React.useState([]) // {id, name, price, image, qty}
+  const [cartItems, setCartItems] = React.useState([]) // {id, name, price, image, qty, variantId}
 
   const addToCart = (product, qty = 1) => {
     setCartItems(prev => {
       const found = prev.find(i => i.id === product.id)
       if (found) return prev.map(i => i.id === product.id ? { ...i, qty: i.qty + qty } : i)
-      return [...prev, { id: product.id, name: product.name, price: product.price, image: product.image, qty }]
+      return [...prev, { 
+        id: product.id, 
+        name: product.name, 
+        price: product.price, 
+        image: product.image, 
+        qty,
+        variantId: product.variantId // IMPORTANT: preserve variantId for checkout
+      }]
     })
     setCartOpen(true)
   }

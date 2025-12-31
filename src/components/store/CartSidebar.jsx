@@ -1,9 +1,24 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { X, Minus, Plus, Trash2 } from 'lucide-react'
 import { useStore } from '@/store'
+import { createCheckout } from '@/lib/shopify'
 
 export default function CartSidebar({ open, onClose }) {
   const { cartItems, updateQty, removeItem, subtotal } = useStore()
+  const [checkingOut, setCheckingOut] = useState(false)
+
+  const handleCheckout = async () => {
+    setCheckingOut(true)
+    try {
+      console.log('Cart items:', cartItems)
+      const checkoutUrl = await createCheckout(cartItems)
+      window.location.href = checkoutUrl
+    } catch (error) {
+      console.error('Checkout error:', error)
+      alert(`Error creating checkout: ${error.message}\n\nPlease check the browser console for details.`)
+      setCheckingOut(false)
+    }
+  }
 
   return (
     <>
@@ -68,17 +83,11 @@ export default function CartSidebar({ open, onClose }) {
               Continue Shopping
             </button>
             <button
-              onClick={() => alert('Log in functionality coming soon.')}
-              className="w-full py-2 text-xs tracking-[0.2em] uppercase border border-white/20 hover:border-white/40 transition"
-            >
-              Log In
-            </button>
-            <button
               className="w-full py-3 border border-zlfr-gold/60 text-[11px] tracking-[0.3em] uppercase hover:bg-zlfr-gold hover:text-black transition disabled:opacity-40"
-              disabled={cartItems.length === 0}
-              onClick={() => alert('Checkout is a placeholder in this demo.')}
+              disabled={cartItems.length === 0 || checkingOut}
+              onClick={handleCheckout}
             >
-              Continue to Checkout
+              {checkingOut ? 'Creating Checkout...' : 'Continue to Checkout'}
             </button>
           </div>
         </div>

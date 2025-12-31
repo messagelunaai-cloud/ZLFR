@@ -1,5 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { Link } from 'react-router-dom'
+import { Instagram } from 'lucide-react'
+import TrustBadges from './TrustBadges'
 
 export default function Footer() {
   const [policiesOpen, setPoliciesOpen] = useState(false)
@@ -18,9 +20,27 @@ export default function Footer() {
     }
   }, [])
 
+  // TikTok icon SVG component
+  const TikTokIcon = () => (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="18"
+      height="18"
+      viewBox="0 0 24 24"
+      fill="currentColor"
+    >
+      <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z" />
+    </svg>
+  )
+
   return (
     <footer className="border-t border-white/10 mt-14 relative">
-      <div className="container-page py-10">
+      {/* Trust Badges */}
+      <div className="max-w-6xl mx-auto px-6 py-8 border-b border-white/10">
+        <TrustBadges variant="grid" />
+      </div>
+
+      <div className="container-page py-10 border-t border-white/10">
         <div className="flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="text-center md:text-left">
             <div className="text-sm tracking-[0.35em] uppercase">ZLFR</div>
@@ -29,10 +49,25 @@ export default function Footer() {
 
           <div className="text-center">
             <div className="text-[10px] tracking-[0.35em] uppercase text-white/60">Follow our socials <span className="text-zlfr-gold">💚</span></div>
-            <div className="mt-3 flex items-center justify-center gap-3 text-xs text-white/60">
-              <a className="hover:text-white" href="https://www.instagram.com/zlfr.collection/" target="_blank" rel="noopener noreferrer">Instagram</a>
-              <span className="text-white/20">•</span>
-              <a className="hover:text-white" href="https://www.tiktok.com/@zlfr.collection" target="_blank" rel="noopener noreferrer">TikTok</a>
+            <div className="mt-3 flex items-center justify-center gap-4">
+              <a 
+                className="opacity-70 hover:opacity-100 transition" 
+                href="https://www.instagram.com/zlfr.collection/" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                aria-label="Instagram"
+              >
+                <Instagram size={20} />
+              </a>
+              <a 
+                className="opacity-70 hover:opacity-100 transition" 
+                href="https://www.tiktok.com/@zlfr.collection" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                aria-label="TikTok"
+              >
+                <TikTokIcon />
+              </a>
             </div>
           </div>
 
@@ -55,7 +90,7 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="mt-8 text-center text-xs text-white/35">© {new Date().getFullYear()} ZLFR Collection</div>
+        <div className="mt-8 text-left text-xs text-white/35">© {new Date().getFullYear()} ZLFR Collection</div>
       </div>
 
       {/* Scrolling Text */}

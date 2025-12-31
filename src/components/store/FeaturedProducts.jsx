@@ -1,10 +1,22 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { products } from '@/data/products'
+import { getProducts } from '@/lib/shopify'
 import ProductCard from './ProductCard'
 
 export default function FeaturedProducts() {
-  const featured = products.slice(0, 4)
+  const [featured, setFeatured] = useState([])
+
+  useEffect(() => {
+    async function loadFeatured() {
+      try {
+        const products = await getProducts()
+        setFeatured(products.slice(0, 4))
+      } catch (error) {
+        console.error('Error loading featured products:', error)
+      }
+    }
+    loadFeatured()
+  }, [])
 
   return (
     <motion.section
