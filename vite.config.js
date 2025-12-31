@@ -6,17 +6,34 @@ import { fileURLToPath } from 'url'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
-// Read .env file
+// Read .env file (only in development, gracefully handle missing file)
 function readEnv() {
-  const envPath = path.join(__dirname, '.env')
-  const envContent = fs.readFileSync(envPath, 'utf-8')
   const env = {}
-  envContent.split('\n').forEach(line => {
-    const [key, value] = line.split('=')
-    if (key && value) {
-      env[key.trim()] = value.trim()
+  
+  // Try to read .env file in development
+  try {
+    const envPath = path.join(__dirname, '.env')
+    if (fs.existsSync(envPath)) {
+      const envContent = fs.readFileSync(envPath, 'utf-8')
+      envContent.split('\n').forEach(line => {
+        const [key, value] = line.split('=')
+        if (key && value) {
+          env[key.trim()] = value.trim()
+        }
+      })
     }
-  })
+  } catch (err) {
+    console.log('Could not read .env file, using process.env')
+  }
+
+  // Fallback to process.env (for Vercel and production)
+  if (!env.VITE_JUDGEME_SHOP_DOMAIN) {
+    env.VITE_JUDGEME_SHOP_DOMAIN = process.env.VITE_JUDGEME_SHOP_DOMAIN || ''
+  }
+  if (!env.VITE_JUDGEME_API_TOKEN) {
+    env.VITE_JUDGEME_API_TOKEN = process.env.VITE_JUDGEME_API_TOKEN || ''
+  }
+
   return env
 }
 
