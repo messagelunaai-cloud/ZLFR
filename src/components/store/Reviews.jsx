@@ -18,42 +18,41 @@ const Reviews = ({ productId }) => {
     setLoading(true);
     setError('');
 
-    // Submit to Judge.me and show success regardless of response
-    // (CORS may block it, but the review still gets submitted server-side)
     try {
-      await fetch('https://api.judge.me/v1/reviews', {
+      // Submit review to backend API endpoint (which calls Stamped.io)
+      const response = await fetch('/api/submit-review', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          shop_domain: 'rbrurv-1t.myshopify.com',
-          api_token: 'jaN0jLO26kSgydspkFUiLEzbra8',
-          review: {
-            body: reviewText,
-            rating: parseInt(rating),
-            reviewer_name: name || 'Anonymous',
-            product_external_id: productId,
-          }
+          rating: rating,
+          body: reviewText,
+          reviewer_name: name || 'Anonymous',
+          product_external_id: productId,
         })
-      }).catch(err => {
-        // CORS errors are expected in dev - Judge.me still receives the review
-        console.log('Note: CORS may block the request, but Judge.me may still have received it');
       });
-    } catch (err) {
-      console.error('Error:', err);
-    }
 
-    // Always show success message
-    setShowReviewForm(false);
-    setShowSuccessModal(true);
-    setRating(0);
-    setReviewText('');
-    setName('');
-    setLoading(false);
-    
-    // Auto-hide success modal after 4 seconds
-    setTimeout(() => setShowSuccessModal(false), 4000);
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to submit review');
+      }
+
+      // Reset form and show success
+      setShowReviewForm(false);
+      setShowSuccessModal(true);
+      setRating(0);
+      setReviewText('');
+      setName('');
+      setLoading(false);
+      
+      // Auto-hide success modal after 4 seconds
+      setTimeout(() => setShowSuccessModal(false), 4000);
+    } catch (err) {
+      console.error('Review submission error:', err);
+      setError(err.message || 'Failed to submit review. Please try again.');
+      setLoading(false);
+    }
   };
   
   // Placeholder reviews - replace with real data from Shopify reviews app

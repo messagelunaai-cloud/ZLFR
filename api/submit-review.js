@@ -12,21 +12,20 @@ export default async function handler(req, res) {
   }
 
   try {
-    const response = await fetch('https://api.judge.me/v1/reviews', {
+    // Submit to Stamped.io API
+    const response = await fetch('https://api.stamped.io/v2/reviews', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'X-Stamped-Auth': process.env.VITE_STAMPED_PUBLIC_KEY,
       },
       body: JSON.stringify({
-        shop_domain: process.env.VITE_JUDGEME_SHOP_DOMAIN,
-        api_token: process.env.VITE_JUDGEME_API_TOKEN,
-        review: {
-          title: 'Product Review',
-          body: body,
-          rating: rating,
-          reviewer_name: reviewer_name || 'Anonymous',
-          product_external_id: product_external_id,
-        }
+        storeHash: process.env.VITE_STAMPED_STORE_HASH,
+        productId: product_external_id,
+        rating: parseInt(rating),
+        reviewerName: reviewer_name || 'Anonymous',
+        reviewText: body,
+        source: 'webform',
       })
     });
 
@@ -38,7 +37,7 @@ export default async function handler(req, res) {
     const data = await response.json();
     return res.status(200).json({ success: true, review: data });
   } catch (error) {
-    console.error('Review submission error:', error);
+    console.error('Stamped.io review submission error:', error);
     return res.status(500).json({ error: 'Failed to submit review' });
   }
 }

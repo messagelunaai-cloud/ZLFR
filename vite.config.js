@@ -27,11 +27,11 @@ function readEnv() {
   }
 
   // Fallback to process.env (for Vercel and production)
-  if (!env.VITE_JUDGEME_SHOP_DOMAIN) {
-    env.VITE_JUDGEME_SHOP_DOMAIN = process.env.VITE_JUDGEME_SHOP_DOMAIN || ''
+  if (!env.VITE_STAMPED_STORE_HASH) {
+    env.VITE_STAMPED_STORE_HASH = process.env.VITE_STAMPED_STORE_HASH || ''
   }
-  if (!env.VITE_JUDGEME_API_TOKEN) {
-    env.VITE_JUDGEME_API_TOKEN = process.env.VITE_JUDGEME_API_TOKEN || ''
+  if (!env.VITE_STAMPED_PUBLIC_KEY) {
+    env.VITE_STAMPED_PUBLIC_KEY = process.env.VITE_STAMPED_PUBLIC_KEY || ''
   }
 
   return env
